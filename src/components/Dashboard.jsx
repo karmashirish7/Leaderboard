@@ -78,11 +78,11 @@ export default function Dashboard({ onLogout }) {
         <div className="header-right">
           <button className="target-btn" onClick={() => setShowTargets(true)} title="Set Targets">
             <Target size={18} />
-            Targets
+            <span>Targets</span>
           </button>
           <button className="add-btn" onClick={handleOpenAdd} id="add-transaction-btn">
             <Plus size={18} />
-            Add Transaction
+            <span>Add Transaction</span>
           </button>
           <button className="logout-btn" onClick={handleLogout} title="Logout">
             <LogOut size={18} />

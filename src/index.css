@@ -57,3 +57,10 @@ input[type="number"] {
 input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(0.5);
 }
+
+/* Prevent iOS auto-zoom on input focus */
+@media (max-width: 768px) {
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+}

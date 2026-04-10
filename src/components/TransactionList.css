@@ -389,17 +389,103 @@
 }
 
 @media (max-width: 768px) {
+  .transactions-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .transactions-header-right {
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .import-btn,
+  .export-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
   .transactions-toolbar {
     flex-direction: column;
   }
-  
+
   .filter-row {
     grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Switch table to card layout */
+  .table-wrapper {
+    border: none;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .transactions-table thead {
+    display: none;
+  }
+
+  .transactions-table,
+  .transactions-table tbody {
+    display: block;
+  }
+
+  .transactions-table tbody tr {
+    display: block;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    padding: 12px 14px;
+  }
+
+  .transactions-table td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    white-space: normal;
+  }
+
+  .transactions-table td:last-child {
+    border-bottom: none;
+    padding-top: 10px;
+  }
+
+  .transactions-table td::before {
+    content: attr(data-label);
+    font-size: 0.68rem;
+    color: rgba(255, 255, 255, 0.35);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    margin-right: 12px;
+  }
+
+  .transactions-table td[data-label="Actions"]::before {
+    display: none;
+  }
+
+  .action-btns {
+    justify-content: flex-end;
+    width: 100%;
+  }
+
+  .td-store {
+    max-width: none;
+    text-align: right;
   }
 }
 
 @media (max-width: 480px) {
   .filter-row {
     grid-template-columns: 1fr;
+  }
+
+  .transactions-header h2 {
+    font-size: 1.15rem;
   }
 }

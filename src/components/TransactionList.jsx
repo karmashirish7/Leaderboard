@@ -294,29 +294,29 @@ export default function TransactionList({ transactions, onDelete, onEdit, onImpo
             <tbody>
               {filtered.map((t) => (
                 <tr key={t.id}>
-                  <td className="td-date">{new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
-                  <td>
+                  <td className="td-date" data-label="Date">{new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</td>
+                  <td data-label="Salesperson">
                     <span className="person-tag">{t.salesperson}</span>
                   </td>
-                  <td className="td-store">{t.storeName}</td>
-                  <td>
+                  <td className="td-store" data-label="Store">{t.storeName}</td>
+                  <td data-label="Plan">
                     <span className={`type-tag ${t.subscriptionType.toLowerCase().replace(/\s+/g, '-')}`}>
                       {t.subscriptionType}
                     </span>
                   </td>
-                  <td>
+                  <td data-label="Duration">
                     {t.subscriptionDuration ? (
                       <span className="duration-tag">{t.subscriptionDuration}</span>
                     ) : (
                       <span className="td-empty">—</span>
                     )}
                   </td>
-                  <td className="td-amount">Rs {Number(t.totalAmount).toLocaleString()}</td>
-                  <td className="td-amount td-paid">Rs {Number(t.paidAmount).toLocaleString()}</td>
-                  <td className={`td-amount ${Number(t.remainingAmount) > 0 ? 'td-remaining' : ''}`}>
+                  <td className="td-amount" data-label="Total">Rs {Number(t.totalAmount).toLocaleString()}</td>
+                  <td className="td-amount td-paid" data-label="Paid">Rs {Number(t.paidAmount).toLocaleString()}</td>
+                  <td className={`td-amount ${Number(t.remainingAmount) > 0 ? 'td-remaining' : ''}`} data-label="Remaining">
                     Rs {Number(t.remainingAmount).toLocaleString()}
                   </td>
-                  <td>
+                  <td data-label="Actions">
                     <div className="action-btns">
                       <button
                         className="edit-btn"

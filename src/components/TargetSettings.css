@@ -125,3 +125,23 @@
   font-size: 0.78rem;
   color: #ff6b6b;
 }
+
+@media (max-width: 640px) {
+  .target-modal {
+    border-radius: 20px 20px 0 0;
+    max-height: 92vh;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .target-password-gate input[type="password"] {
+    font-size: 1rem; /* prevent iOS zoom */
+  }
+}
+
+@media (max-width: 480px) {
+  .individual-name {
+    width: 75px;
+    font-size: 0.82rem;
+  }
+}
