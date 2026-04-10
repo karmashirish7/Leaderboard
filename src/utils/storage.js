@@ -92,10 +92,10 @@ export const bulkInsertTransactions = async (transactions) => {
   if (error) throw error;
 };
 
-// ── Targets (localStorage) ────────────────────────────────────────────────────
+// ── Targets ───────────────────────────────────────────────────────────────────
 const TARGETS_KEY = 'sales_leaderboard_targets';
 
-const DEFAULT_TARGETS = {
+export const DEFAULT_TARGETS = {
   team: 0,
   individual: {
     Nischal: 0,
@@ -105,6 +105,7 @@ const DEFAULT_TARGETS = {
   },
 };
 
+// Fast sync read from localStorage (used for initial render)
 export const getTargets = () => {
   try {
     const raw = localStorage.getItem(TARGETS_KEY);
@@ -114,8 +115,29 @@ export const getTargets = () => {
   }
 };
 
-export const saveTargets = (targets) => {
+// Async read from Supabase (global), falls back to localStorage
+export const fetchTargets = async () => {
+  try {
+    const { data, error } = await supabase
+      .from('settings')
+      .select('value')
+      .eq('key', 'targets')
+      .single();
+    if (!error && data?.value) {
+      const merged = { ...DEFAULT_TARGETS, ...data.value };
+      localStorage.setItem(TARGETS_KEY, JSON.stringify(merged));
+      return merged;
+    }
+  } catch {}
+  return getTargets();
+};
+
+// Save to localStorage + Supabase so all clients see the update
+export const saveTargets = async (targets) => {
   localStorage.setItem(TARGETS_KEY, JSON.stringify(targets));
+  await supabase
+    .from('settings')
+    .upsert({ key: 'targets', value: targets });
 };
 
 // ── Constants ──────────────────────────────────────────────────────────────────

@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from 'react';
-import { getTransactions, deleteTransaction, logout, getTargets } from '../utils/storage';
+import { getTransactions, deleteTransaction, logout, getTargets, fetchTargets } from '../utils/storage';
 import HeroStats from './HeroStats';
 import Leaderboard from './Leaderboard';
 import Analytics from './Analytics';
@@ -24,9 +24,10 @@ export default function Dashboard({ onLogout }) {
   }, []);
 
   useEffect(() => {
-    getTransactions()
-      .then(setTransactions)
-      .finally(() => setLoading(false));
+    Promise.all([
+      getTransactions().then(setTransactions),
+      fetchTargets().then(setTargets),
+    ]).finally(() => setLoading(false));
   }, []);
 
   const handleDelete = useCallback(async (id) => {
