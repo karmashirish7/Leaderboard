@@ -1,0 +1,88 @@
+.target-modal {
+  max-width: 480px;
+  width: 100%;
+}
+
+.target-form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+  padding: 4px 0 8px;
+}
+
+.target-section h3 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin: 0 0 4px;
+}
+
+.target-hint {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  margin: 0 0 12px;
+}
+
+.target-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 10px 14px;
+  transition: border-color 0.2s;
+}
+
+.target-input-row:focus-within {
+  border-color: #6c5ce7;
+}
+
+.target-currency {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+
+.target-input-row input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  min-width: 0;
+}
+
+.target-input-row input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+  font-weight: 400;
+}
+
+.individual-targets {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.individual-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.individual-name {
+  width: 90px;
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.7);
+  flex-shrink: 0;
+}
+
+.individual-row .target-input-row {
+  flex: 1;
+  padding: 8px 12px;
+}
