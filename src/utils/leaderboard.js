@@ -79,23 +79,24 @@ export const rankLeaderboard = (stats, mode = 'revenue') => {
   return { ranked: teamMembers, other };
 };
 
-export const getAnalytics = (transactions, filter = 'month') => {
-  const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  
-  const filtered = filter === 'month'
-    ? transactions.filter(t => new Date(t.date) >= startOfMonth)
-    : transactions;
-  
+const filterByMonth = (transactions, year, month) =>
+  transactions.filter(t => {
+    const d = new Date(t.date);
+    return d.getFullYear() === year && d.getMonth() === month;
+  });
+
+export const getAnalytics = (transactions, year, month) => {
+  const filtered = filterByMonth(transactions, year, month);
+
   const totalRevenue = filtered.reduce((sum, t) => sum + (Number(t.paidAmount) || 0), 0);
   const totalOutstanding = filtered.reduce((sum, t) => sum + (Number(t.remainingAmount) || 0), 0);
   const totalSales = filtered.reduce((sum, t) => sum + (Number(t.totalAmount) || 0), 0);
-  
+
   const subscriptionBreakdown = {};
   SUBSCRIPTION_TYPES.forEach(type => {
     subscriptionBreakdown[type] = filtered.filter(t => t.subscriptionType === type).length;
   });
-  
+
   const salesByPerson = {};
   SALESPERSONS.forEach(name => {
     salesByPerson[name] = filtered
@@ -111,4 +112,24 @@ export const getAnalytics = (transactions, filter = 'month') => {
     salesByPerson,
     transactionCount: filtered.length,
   };
+};
+
+export const getMonthlyTrend = (transactions, monthsBack = 6) => {
+  const now = new Date();
+  const result = [];
+  for (let i = monthsBack - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const year = d.getFullYear();
+    const month = d.getMonth();
+    const label = d.toLocaleDateString('en-US', { month: 'short', year: '2-digit' });
+    const monthTx = filterByMonth(transactions, year, month);
+    result.push({
+      label,
+      year,
+      month,
+      revenue: monthTx.reduce((sum, t) => sum + (Number(t.paidAmount) || 0), 0),
+      transactions: monthTx.length,
+    });
+  }
+  return result;
 };
