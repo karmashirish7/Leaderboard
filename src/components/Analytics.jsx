@@ -5,7 +5,7 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, LineChart, Line, CartesianGrid,
 } from 'recharts';
-import { DollarSign, AlertCircle, ShoppingBag, TrendingUp, ChevronLeft, ChevronRight } from 'lucide-react';
+import { DollarSign, AlertCircle, ShoppingBag, TrendingUp, ChevronLeft, ChevronRight, X } from 'lucide-react';
 import './Analytics.css';
 
 const PIE_COLORS = ['#74b9ff', '#a29bfe', '#00cec9', '#ffd700'];
@@ -43,10 +43,65 @@ function pctChange(current, prev) {
   return Math.round(((current - prev) / prev) * 100);
 }
 
+function DrillModal({ title, rows, monthLabel, onClose }) {
+  const total = rows.reduce((s, t) => s + (Number(t.remainingAmount) || 0), 0);
+  const isOutstanding = title === 'Outstanding';
+
+  return (
+    <div className="modal-overlay" onClick={e => e.target === e.currentTarget && onClose()}>
+      <div className="modal-content drill-modal">
+        <div className="modal-header">
+          <div>
+            <h2>{title}</h2>
+            <p className="drill-subtitle">{monthLabel} · {rows.length} transaction{rows.length !== 1 ? 's' : ''}</p>
+          </div>
+          <button className="close-btn" onClick={onClose} aria-label="Close"><X size={20} /></button>
+        </div>
+
+        {rows.length === 0 ? (
+          <p className="drill-empty">No {title.toLowerCase()} for this month.</p>
+        ) : (
+          <>
+            <div className="drill-list">
+              {rows.map(t => (
+                <div key={t.id} className="drill-row">
+                  <div className="drill-row-top">
+                    <span className="drill-store">{t.storeName}</span>
+                    <span className="drill-date">{new Date(t.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
+                  </div>
+                  <div className="drill-row-bottom">
+                    <span className="drill-person">{t.salesperson}</span>
+                    <span className={`drill-plan drill-plan--${t.subscriptionType.toLowerCase().replace(/\s+/g, '-')}`}>
+                      {t.subscriptionType}
+                    </span>
+                    <div className="drill-amounts">
+                      <span className="drill-paid">Paid Rs {Number(t.paidAmount).toLocaleString()}</span>
+                      {Number(t.remainingAmount) > 0 && (
+                        <span className="drill-remaining">Due Rs {Number(t.remainingAmount).toLocaleString()}</span>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {isOutstanding && (
+              <div className="drill-footer">
+                <span>Total Outstanding</span>
+                <span className="drill-footer-amount">Rs {total.toLocaleString()}</span>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function Analytics({ transactions }) {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
   const [month, setMonth] = useState(now.getMonth());
+  const [drill, setDrill] = useState(null); // 'outstanding' | 'all' | null
 
   const goToPrev = () => {
     if (month === 0) { setYear(y => y - 1); setMonth(11); }
@@ -66,6 +121,14 @@ export default function Analytics({ transactions }) {
   const monthLabel = new Date(year, month, 1).toLocaleDateString('en-US', {
     month: 'long', year: 'numeric',
   });
+
+  const monthTx = useMemo(
+    () => transactions.filter(t => {
+      const d = new Date(t.date);
+      return d.getFullYear() === year && d.getMonth() === month;
+    }),
+    [transactions, year, month],
+  );
 
   const analytics = useMemo(() => getAnalytics(transactions, year, month), [transactions, year, month]);
 
@@ -110,7 +173,7 @@ export default function Analytics({ transactions }) {
 
   const hasData = analytics.transactionCount > 0;
 
-  return (
+  return <>
     <section className="analytics-section" id="analytics">
       <div className="analytics-header">
         <h2>Analytics</h2>
@@ -140,7 +203,7 @@ export default function Analytics({ transactions }) {
           </div>
         </div>
 
-        <div className="metric-card outstanding">
+        <div className="metric-card outstanding metric-card--clickable" onClick={() => setDrill('outstanding')} title="View outstanding transactions">
           <div className="metric-icon"><AlertCircle size={20} /></div>
           <div className="metric-info">
             <span className="metric-label">Outstanding</span>
@@ -149,7 +212,7 @@ export default function Analytics({ transactions }) {
           </div>
         </div>
 
-        <div className="metric-card transactions-metric">
+        <div className="metric-card transactions-metric metric-card--clickable" onClick={() => setDrill('all')} title="View all transactions">
           <div className="metric-icon"><ShoppingBag size={20} /></div>
           <div className="metric-info">
             <span className="metric-label">Transactions</span>
@@ -270,5 +333,14 @@ export default function Analytics({ transactions }) {
         </div>
       )}
     </section>
-  );
+
+    {drill && (
+      <DrillModal
+        title={drill === 'outstanding' ? 'Outstanding' : 'All Transactions'}
+        rows={drill === 'outstanding' ? monthTx.filter(t => Number(t.remainingAmount) > 0) : monthTx}
+        monthLabel={monthLabel}
+        onClose={() => setDrill(null)}
+      />
+    )}
+  </>;
 }

@@ -206,6 +206,144 @@
   border-radius: 14px;
 }
 
+/* ── Clickable metric cards ── */
+.metric-card--clickable {
+  cursor: pointer;
+}
+
+.metric-card--clickable:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+/* ── Drill-down modal ── */
+.drill-modal {
+  max-width: 560px;
+  width: 100%;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.drill-subtitle {
+  font-size: 0.78rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin: 2px 0 0;
+}
+
+.drill-empty {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 0.9rem;
+  padding: 24px 0;
+  text-align: center;
+}
+
+.drill-list {
+  overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 4px 0 8px;
+}
+
+.drill-row {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.drill-row-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.drill-store {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #fff;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.drill-date {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  flex-shrink: 0;
+}
+
+.drill-row-bottom {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.drill-person {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  background: rgba(108, 92, 231, 0.12);
+  color: #a29bfe;
+  border-radius: 6px;
+}
+
+.drill-plan {
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+.drill-plan--basic { background: rgba(116,185,255,0.1); color: #74b9ff; }
+.drill-plan--premium { background: rgba(162,155,254,0.1); color: #a29bfe; }
+.drill-plan--business-plus { background: rgba(0,206,201,0.1); color: #00cec9; }
+.drill-plan--platinum { background: rgba(255,215,0,0.1); color: #ffd700; }
+
+.drill-amounts {
+  margin-left: auto;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.drill-paid {
+  font-size: 0.8rem;
+  color: #55efc4;
+  font-weight: 600;
+}
+
+.drill-remaining {
+  font-size: 0.8rem;
+  color: #fdcb6e;
+  font-weight: 600;
+}
+
+.drill-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  margin-top: 4px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.drill-footer-amount {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fdcb6e;
+}
+
 /* ── Responsive ── */
 @media (max-width: 900px) {
   .metrics-grid {

@@ -80,22 +80,24 @@ const CustomPieTooltip = ({ active, payload }) => {
 
 export default function HeroStats({ transactions, targets }) {
   const currentMonth = new Date().toLocaleString('default', { month: 'long', year: 'numeric' });
-  
-  const { analytics, barData, pieData, dailyData, monthTotal, lastMonthTotal, growthPercent } = useMemo(() => {
-    const an = getAnalytics(transactions, 'month');
+  const year = new Date().getFullYear();
+  const month = new Date().getMonth();
+  const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
 
-    
+  const analytics = useMemo(
+    () => getAnalytics(transactions, year, month),
+    [transactions, year, month],
+  );
+  const { barData, pieData, dailyData, monthTotal, lastMonthTotal, growthPercent } = useMemo(() => {
+    const now = new Date();
+
     // Bar data: revenue comparison per salesperson (paid vs remaining)
     const bd = SALESPERSONS
       .filter(name => name !== 'Other')
       .map(name => {
-        const personTx = transactions.filter(t => {
-          const txDate = new Date(t.date);
-          const now = new Date();
-          return t.salesperson === name &&
-            txDate.getMonth() === now.getMonth() &&
-            txDate.getFullYear() === now.getFullYear();
-        });
+        const personTx = transactions.filter(t =>
+          t.salesperson === name && String(t.date || '').startsWith(monthPrefix)
+        );
         const paid = personTx.reduce((s, t) => s + (Number(t.paidAmount) || 0), 0);
         const remaining = personTx.reduce((s, t) => s + (Number(t.remainingAmount) || 0), 0);
         return {
@@ -111,13 +113,12 @@ export default function HeroStats({ transactions, targets }) {
     const pd = SUBSCRIPTION_TYPES
       .map((type, i) => ({
         name: type,
-        value: an.subscriptionBreakdown[type],
+        value: analytics.subscriptionBreakdown[type],
         color: PIE_COLORS[i],
       }))
       .filter(d => d.value > 0);
 
     // Daily trend data for area chart
-    const now = new Date();
     const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
     const dd = [];
     for (let d = 1; d <= Math.min(now.getDate(), daysInMonth); d++) {
@@ -138,18 +139,17 @@ export default function HeroStats({ transactions, targets }) {
       return d >= lastMonth && d <= lastMonthEnd;
     });
     const lmTotal = lastMonthTx.reduce((s, t) => s + (Number(t.paidAmount) || 0), 0);
-    const growth = lmTotal > 0 ? Math.round(((an.totalRevenue - lmTotal) / lmTotal) * 100) : (an.totalRevenue > 0 ? 100 : 0);
+    const growth = lmTotal > 0 ? Math.round(((analytics.totalRevenue - lmTotal) / lmTotal) * 100) : (analytics.totalRevenue > 0 ? 100 : 0);
 
     return {
-      analytics: an,
       barData: bd,
       pieData: pd,
       dailyData: dd,
-      monthTotal: an.totalRevenue,
+      monthTotal: analytics.totalRevenue,
       lastMonthTotal: lmTotal,
       growthPercent: growth,
     };
-  }, [transactions, targets]);
+  }, [transactions, targets, analytics, monthPrefix]);
 
   const collectionRate = analytics.totalSales > 0
     ? Math.round((analytics.totalRevenue / analytics.totalSales) * 100) : 0;

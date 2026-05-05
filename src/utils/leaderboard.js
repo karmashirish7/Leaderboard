@@ -79,11 +79,10 @@ export const rankLeaderboard = (stats, mode = 'revenue') => {
   return { ranked: teamMembers, other };
 };
 
-const filterByMonth = (transactions, year, month) =>
-  transactions.filter(t => {
-    const d = new Date(t.date);
-    return d.getFullYear() === year && d.getMonth() === month;
-  });
+const filterByMonth = (transactions, year, month) => {
+  const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+  return transactions.filter(t => String(t.date || '').startsWith(prefix));
+};
 
 export const getAnalytics = (transactions, year, month) => {
   const filtered = filterByMonth(transactions, year, month);
