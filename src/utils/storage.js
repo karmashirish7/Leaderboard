@@ -142,11 +142,13 @@ export const saveTargets = async (targets) => {
 
 // ── Constants ──────────────────────────────────────────────────────────────────
 export const SALESPERSONS = ['Nischal', 'Prashuv', 'Samiksha', 'Luniva', 'Other'];
-export const SUBSCRIPTION_TYPES = ['Basic', 'Premium', 'Business Plus', 'Platinum'];
+export const SUBSCRIPTION_TYPES = ['Basic', 'Premium', 'Business Plus', 'Platinum', 'Sambad - Starters', 'Sambad - Growth'];
 export const SUBSCRIPTION_POINTS = {
   'Basic': 1,
   'Premium': 3,
   'Business Plus': 5,
   'Platinum': 8,
+  'Sambad - Starters': 2,
+  'Sambad - Growth': 4,
 };
 export const SUBSCRIPTION_DURATIONS = ['Monthly', 'Quarterly', 'Semi Annually', 'Yearly'];
