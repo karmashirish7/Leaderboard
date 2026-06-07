@@ -35,6 +35,7 @@ const PERSON_COLORS = {
   Prashuv: '#00cec9',
   Samiksha: '#fd79a8',
   Luniva: '#fdcb6e',
+  'Avash Neupane': '#55efc4',
   Other: '#636e72',
 };
 

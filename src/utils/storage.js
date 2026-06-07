@@ -141,7 +141,7 @@ export const saveTargets = async (targets) => {
 };
 
 // ── Constants ──────────────────────────────────────────────────────────────────
-export const SALESPERSONS = ['Nischal', 'Prashuv', 'Samiksha', 'Luniva', 'Other'];
+export const SALESPERSONS = ['Nischal', 'Prashuv', 'Samiksha', 'Luniva', 'Avash Neupane', 'Other'];
 export const SUBSCRIPTION_TYPES = ['Basic', 'Premium', 'Business Plus', 'Platinum', 'Sambad - Starters', 'Sambad - Growth'];
 export const SUBSCRIPTION_POINTS = {
   'Basic': 1,
