@@ -16,14 +16,19 @@ const RANK_COLORS = {
   3: 'bronze',
 };
 
-export default function Leaderboard({ transactions, targets }) {
+// period: optional { year, month } — locks the leaderboard to that month (used in Analytics)
+export default function Leaderboard({ transactions, targets, period }) {
   const [filter, setFilter] = useState('month');
   const [rankMode, setRankMode] = useState('revenue');
 
   const { ranked, other } = useMemo(() => {
-    const stats = calculateLeaderboard(transactions, filter);
+    const stats = calculateLeaderboard(transactions, period || filter);
     return rankLeaderboard(stats, rankMode);
-  }, [transactions, filter, rankMode]);
+  }, [transactions, period, filter, rankMode]);
+
+  const periodLabel = period
+    ? `${new Date(period.year, period.month, 1).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`
+    : filter === 'month' ? "This month's" : 'All time';
 
   const hasData = ranked.some(m => m.transactionCount > 0);
 
@@ -36,11 +41,11 @@ export default function Leaderboard({ transactions, targets }) {
             Sales Leaderboard
           </h2>
           <p className="leaderboard-subtitle">
-            {filter === 'month' ? "This month's" : 'All time'} performance rankings
+            {periodLabel} performance rankings
           </p>
         </div>
         <div className="leaderboard-controls">
-          <div className="toggle-group">
+          {!period && <div className="toggle-group">
             <button
               className={`toggle-btn ${filter === 'month' ? 'active' : ''}`}
               onClick={() => setFilter('month')}
@@ -53,7 +58,7 @@ export default function Leaderboard({ transactions, targets }) {
             >
               All Time
             </button>
-          </div>
+          </div>}
           <div className="toggle-group">
             <button
               className={`toggle-btn ${rankMode === 'revenue' ? 'active' : ''}`}
@@ -76,7 +81,7 @@ export default function Leaderboard({ transactions, targets }) {
       {!hasData ? (
         <div className="leaderboard-empty">
           <Star size={48} />
-          <p>No transactions yet. Add your first sale to see the leaderboard!</p>
+          <p>{period ? 'No transactions for this month.' : 'No transactions yet. Add your first sale to see the leaderboard!'}</p>
         </div>
       ) : (
         <div className="leaderboard-grid">
@@ -102,13 +107,14 @@ export default function Leaderboard({ transactions, targets }) {
               {(() => {
                 const personalTarget = targets?.individual?.[person.name] || 0;
                 if (!personalTarget) return null;
-                const pct = Math.round((person.totalPaid / personalTarget) * 100);
-                const achieved = person.totalPaid >= personalTarget;
+                // Target progress is measured on paid amount excluding VAT
+                const pct = Math.round((person.totalPaidExVat / personalTarget) * 100);
+                const achieved = person.totalPaidExVat >= personalTarget;
                 return (
                   <div className="card-target">
                     <div className="card-target-row">
                       <span className="card-target-numbers">
-                        Rs {person.totalPaid.toLocaleString()}
+                        Rs {person.totalPaidExVat.toLocaleString()}
                         <span className="card-target-max"> / {personalTarget.toLocaleString()}</span>
                       </span>
                       <span className={`card-target-pct ${achieved ? 'achieved' : ''}`}>
@@ -128,7 +134,10 @@ export default function Leaderboard({ transactions, targets }) {
               <div className="card-stats">
                 <div className="stat primary">
                   <span className="stat-label">Paid</span>
-                  <span className="stat-value">Rs {person.totalPaid.toLocaleString()}</span>
+                  <span className="stat-value">
+                    Rs {person.totalPaid.toLocaleString()}
+                    <span className="stat-exvat"> ({person.totalPaidExVat.toLocaleString()})</span>
+                  </span>
                 </div>
                 <div className="stat">
                   <span className="stat-label">Sales</span>

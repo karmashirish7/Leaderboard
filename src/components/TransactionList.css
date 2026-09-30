@@ -6,12 +6,15 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
 .transactions-header-right {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
 }
 
@@ -20,6 +23,15 @@
   font-weight: 700;
   color: #fff;
   margin: 0;
+}
+
+.tx-pending-total {
+  background: rgba(255, 118, 117, 0.1);
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #ff7675;
 }
 
 .tx-count {
@@ -347,6 +359,9 @@
 .type-tag.premium { background: rgba(162, 155, 254, 0.1); color: #a29bfe; }
 .type-tag.business-plus { background: rgba(0, 206, 201, 0.1); color: #00cec9; }
 .type-tag.platinum { background: rgba(255, 215, 0, 0.1); color: #ffd700; }
+.type-tag.sambad---starters { background: rgba(250, 177, 160, 0.1); color: #fab1a0; }
+.type-tag.sambad---growth { background: rgba(225, 112, 85, 0.1); color: #e17055; }
+.type-tag.enterprise { background: rgba(255, 118, 117, 0.1); color: #ff7675; }
 
 .td-amount {
   font-weight: 600;

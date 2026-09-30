@@ -18,47 +18,6 @@
   margin: 0;
 }
 
-/* ── Month navigation ── */
-.month-nav {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 10px;
-  padding: 6px 10px;
-}
-
-.month-nav-btn {
-  background: none;
-  border: none;
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  padding: 4px;
-  border-radius: 6px;
-  transition: color 0.2s, background 0.2s;
-}
-
-.month-nav-btn:hover:not(:disabled) {
-  color: #a29bfe;
-  background: rgba(108, 92, 231, 0.12);
-}
-
-.month-nav-btn:disabled {
-  opacity: 0.25;
-  cursor: not-allowed;
-}
-
-.month-nav-label {
-  font-size: 0.88rem;
-  font-weight: 600;
-  color: #fff;
-  min-width: 130px;
-  text-align: center;
-}
-
 /* ── Metrics ── */
 .metrics-grid {
   display: grid;
@@ -307,6 +266,9 @@
 .drill-plan--premium { background: rgba(162,155,254,0.1); color: #a29bfe; }
 .drill-plan--business-plus { background: rgba(0,206,201,0.1); color: #00cec9; }
 .drill-plan--platinum { background: rgba(255,215,0,0.1); color: #ffd700; }
+.drill-plan--sambad---starters { background: rgba(250,177,160,0.1); color: #fab1a0; }
+.drill-plan--sambad---growth { background: rgba(225,112,85,0.1); color: #e17055; }
+.drill-plan--enterprise { background: rgba(255,118,117,0.1); color: #ff7675; }
 
 .drill-amounts {
   margin-left: auto;
@@ -361,14 +323,6 @@
     align-items: flex-start;
   }
 
-  .month-nav {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .month-nav-label {
-    flex: 1;
-  }
 
   .metrics-grid {
     grid-template-columns: 1fr 1fr;

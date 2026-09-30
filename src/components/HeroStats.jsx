@@ -33,13 +33,12 @@ const TargetDot = (props) => {
 const PERSON_COLORS = {
   Nischal: '#6c5ce7',
   Prashuv: '#00cec9',
-  Samiksha: '#fd79a8',
   Luniva: '#fdcb6e',
   'Avash Neupane': '#55efc4',
   Other: '#636e72',
 };
 
-const PIE_COLORS = ['#74b9ff', '#a29bfe', '#00cec9', '#ffd700'];
+const PIE_COLORS = ['#74b9ff', '#a29bfe', '#00cec9', '#ffd700', '#fab1a0', '#e17055', '#ff7675'];
 
 const CustomBarTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
@@ -155,10 +154,12 @@ export default function HeroStats({ transactions, targets }) {
   const collectionRate = analytics.totalSales > 0
     ? Math.round((analytics.totalRevenue / analytics.totalSales) * 100) : 0;
 
+  // Team target progress is measured on revenue excluding VAT
+  const monthTotalExVat = analytics.totalRevenueExVat;
   const teamTarget = targets?.team || 0;
-  const teamAchievedPct = teamTarget > 0 ? Math.min(Math.round((monthTotal / teamTarget) * 100), 100) : null;
-  const teamOverPct = teamTarget > 0 && monthTotal > teamTarget
-    ? Math.round(((monthTotal - teamTarget) / teamTarget) * 100) : 0;
+  const teamAchievedPct = teamTarget > 0 ? Math.min(Math.round((monthTotalExVat / teamTarget) * 100), 100) : null;
+  const teamOverPct = teamTarget > 0 && monthTotalExVat > teamTarget
+    ? Math.round(((monthTotalExVat - teamTarget) / teamTarget) * 100) : 0;
 
   return (
     <section className="hero-stats" id="hero-stats">
@@ -178,18 +179,21 @@ export default function HeroStats({ transactions, targets }) {
               {teamTarget > 0 ? (
                 <span className="amount">
                   {monthTotal.toLocaleString()}
-                  <span className="amount-target"> / {teamTarget.toLocaleString()}</span>
+                  <span className="amount-target"> ({monthTotalExVat.toLocaleString()}) / {teamTarget.toLocaleString()}</span>
                 </span>
               ) : (
-                <span className="amount">{monthTotal.toLocaleString()}</span>
+                <span className="amount">
+                  {monthTotal.toLocaleString()}
+                  <span className="amount-target"> ({monthTotalExVat.toLocaleString()})</span>
+                </span>
               )}
             </div>
 
             {teamTarget > 0 && (
               <div className="team-target-pct-display">
-                <span className={monthTotal >= teamTarget ? 'achieved' : ''}>
+                <span className={monthTotalExVat >= teamTarget ? 'achieved' : ''}>
                   {teamAchievedPct}% achieved
-                  {monthTotal >= teamTarget && teamOverPct > 0 && ` (+${teamOverPct}% over)`}
+                  {monthTotalExVat >= teamTarget && teamOverPct > 0 && ` (+${teamOverPct}% over)`}
                 </span>
               </div>
             )}
@@ -205,8 +209,8 @@ export default function HeroStats({ transactions, targets }) {
               <div className="team-target-block">
                 <div className="team-target-bar">
                   <div
-                    className={`team-target-fill ${monthTotal >= teamTarget ? 'achieved' : ''}`}
-                    style={{ width: `${Math.min((monthTotal / teamTarget) * 100, 100)}%` }}
+                    className={`team-target-fill ${monthTotalExVat >= teamTarget ? 'achieved' : ''}`}
+                    style={{ width: `${Math.min((monthTotalExVat / teamTarget) * 100, 100)}%` }}
                   />
                 </div>
               </div>

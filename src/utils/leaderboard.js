@@ -1,12 +1,20 @@
-import { SALESPERSONS, SUBSCRIPTION_TYPES, SUBSCRIPTION_POINTS } from './storage';
+import { SALESPERSONS, SUBSCRIPTION_TYPES, SUBSCRIPTION_POINTS, exVat } from './storage';
 
+export const filterByMonth = (transactions, year, month) => {
+  const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+  return transactions.filter(t => String(t.date || '').startsWith(prefix));
+};
+
+// filter: 'month' (current month), 'all', or { year, month } for a specific month
 export const calculateLeaderboard = (transactions, filter = 'month') => {
   const now = new Date();
-  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-  
-  const filtered = filter === 'month'
-    ? transactions.filter(t => new Date(t.date) >= startOfMonth)
-    : transactions;
+
+  let filtered = transactions;
+  if (filter === 'month') {
+    filtered = filterByMonth(transactions, now.getFullYear(), now.getMonth());
+  } else if (filter && typeof filter === 'object') {
+    filtered = filterByMonth(transactions, filter.year, filter.month);
+  }
 
   const stats = {};
   
@@ -15,6 +23,7 @@ export const calculateLeaderboard = (transactions, filter = 'month') => {
       name,
       totalSales: 0,
       totalPaid: 0,
+      totalPaidExVat: 0,
       totalRemaining: 0,
       subscriptions: {},
       totalPoints: 0,
@@ -35,6 +44,7 @@ export const calculateLeaderboard = (transactions, filter = 'month') => {
     
     person.totalSales += Number(t.totalAmount) || 0;
     person.totalPaid += Number(t.paidAmount) || 0;
+    person.totalPaidExVat += exVat(t.paidAmount);
     person.totalRemaining += Number(t.remainingAmount) || 0;
     person.transactionCount += 1;
     
@@ -79,17 +89,13 @@ export const rankLeaderboard = (stats, mode = 'revenue') => {
   return { ranked: teamMembers, other };
 };
 
-const filterByMonth = (transactions, year, month) => {
-  const prefix = `${year}-${String(month + 1).padStart(2, '0')}`;
-  return transactions.filter(t => String(t.date || '').startsWith(prefix));
-};
-
 export const getAnalytics = (transactions, year, month) => {
   const filtered = filterByMonth(transactions, year, month);
 
   const totalRevenue = filtered.reduce((sum, t) => sum + (Number(t.paidAmount) || 0), 0);
   const totalOutstanding = filtered.reduce((sum, t) => sum + (Number(t.remainingAmount) || 0), 0);
   const totalSales = filtered.reduce((sum, t) => sum + (Number(t.totalAmount) || 0), 0);
+  const totalRevenueExVat = filtered.reduce((sum, t) => sum + exVat(t.paidAmount), 0);
 
   const subscriptionBreakdown = {};
   SUBSCRIPTION_TYPES.forEach(type => {
@@ -105,6 +111,7 @@ export const getAnalytics = (transactions, year, month) => {
 
   return {
     totalRevenue,
+    totalRevenueExVat,
     totalOutstanding,
     totalSales,
     subscriptionBreakdown,

@@ -100,7 +100,7 @@ export const DEFAULT_TARGETS = {
   individual: {
     Nischal: 0,
     Prashuv: 0,
-    Samiksha: 0,
+    'Avash Neupane': 0,
     Luniva: 0,
   },
 };
@@ -141,8 +141,8 @@ export const saveTargets = async (targets) => {
 };
 
 // ── Constants ──────────────────────────────────────────────────────────────────
-export const SALESPERSONS = ['Nischal', 'Prashuv', 'Samiksha', 'Luniva', 'Avash Neupane', 'Other'];
-export const SUBSCRIPTION_TYPES = ['Basic', 'Premium', 'Business Plus', 'Platinum', 'Sambad - Starters', 'Sambad - Growth'];
+export const SALESPERSONS = ['Nischal', 'Prashuv', 'Luniva', 'Avash Neupane', 'Other'];
+export const SUBSCRIPTION_TYPES = ['Basic', 'Premium', 'Business Plus', 'Platinum', 'Sambad - Starters', 'Sambad - Growth', 'Enterprise'];
 export const SUBSCRIPTION_POINTS = {
   'Basic': 1,
   'Premium': 3,
@@ -150,5 +150,10 @@ export const SUBSCRIPTION_POINTS = {
   'Platinum': 8,
   'Sambad - Starters': 2,
   'Sambad - Growth': 4,
+  'Enterprise': 12,
 };
+export const VAT_RATE = 0.13;
+// Amount excluding 13% VAT, rounded to paisa (e.g. 113000 → 100000)
+export const exVat = (amount) => Math.round(((Number(amount) || 0) / (1 + VAT_RATE)) * 100) / 100;
+
 export const SUBSCRIPTION_DURATIONS = ['Monthly', 'Quarterly', 'Semi Annually', 'Yearly'];

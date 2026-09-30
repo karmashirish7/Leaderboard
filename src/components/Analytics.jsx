@@ -1,14 +1,17 @@
 import { useState, useMemo } from 'react';
-import { getAnalytics, getMonthlyTrend } from '../utils/leaderboard';
+import { getAnalytics, getMonthlyTrend, filterByMonth } from '../utils/leaderboard';
 import { SUBSCRIPTION_TYPES, SALESPERSONS } from '../utils/storage';
 import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, Legend, LineChart, Line, CartesianGrid,
 } from 'recharts';
-import { DollarSign, AlertCircle, ShoppingBag, TrendingUp, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { DollarSign, AlertCircle, ShoppingBag, TrendingUp, X } from 'lucide-react';
+import Leaderboard from './Leaderboard';
+import TransactionList from './TransactionList';
+import MonthNav from './MonthNav';
 import './Analytics.css';
 
-const PIE_COLORS = ['#74b9ff', '#a29bfe', '#00cec9', '#ffd700'];
+const PIE_COLORS = ['#74b9ff', '#a29bfe', '#00cec9', '#ffd700', '#fab1a0', '#e17055', '#ff7675'];
 const BAR_COLORS = ['#6c5ce7', '#00cec9', '#fd79a8', '#fdcb6e', '#74b9ff'];
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -97,36 +100,20 @@ function DrillModal({ title, rows, monthLabel, onClose }) {
   );
 }
 
-export default function Analytics({ transactions }) {
-  const now = new Date();
-  const [year, setYear] = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth());
+export default function Analytics({ transactions, targets, onDelete, onEdit }) {
+  const [period, setPeriod] = useState(() => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() };
+  });
+  const { year, month } = period;
   const [drill, setDrill] = useState(null); // 'outstanding' | 'all' | null
-
-  const goToPrev = () => {
-    if (month === 0) { setYear(y => y - 1); setMonth(11); }
-    else setMonth(m => m - 1);
-  };
-
-  const goToNext = () => {
-    const nextIsInFuture = year > now.getFullYear() ||
-      (year === now.getFullYear() && month >= now.getMonth());
-    if (nextIsInFuture) return;
-    if (month === 11) { setYear(y => y + 1); setMonth(0); }
-    else setMonth(m => m + 1);
-  };
-
-  const isCurrentMonth = year === now.getFullYear() && month === now.getMonth();
 
   const monthLabel = new Date(year, month, 1).toLocaleDateString('en-US', {
     month: 'long', year: 'numeric',
   });
 
   const monthTx = useMemo(
-    () => transactions.filter(t => {
-      const d = new Date(t.date);
-      return d.getFullYear() === year && d.getMonth() === month;
-    }),
+    () => filterByMonth(transactions, year, month),
     [transactions, year, month],
   );
 
@@ -177,20 +164,7 @@ export default function Analytics({ transactions }) {
     <section className="analytics-section" id="analytics">
       <div className="analytics-header">
         <h2>Analytics</h2>
-        <div className="month-nav">
-          <button className="month-nav-btn" onClick={goToPrev} aria-label="Previous month">
-            <ChevronLeft size={16} />
-          </button>
-          <span className="month-nav-label">{monthLabel}</span>
-          <button
-            className="month-nav-btn"
-            onClick={goToNext}
-            disabled={isCurrentMonth}
-            aria-label="Next month"
-          >
-            <ChevronRight size={16} />
-          </button>
-        </div>
+        <MonthNav value={period} onChange={setPeriod} />
       </div>
 
       <div className="metrics-grid">
@@ -333,6 +307,17 @@ export default function Analytics({ transactions }) {
         </div>
       )}
     </section>
+
+    <Leaderboard transactions={transactions} targets={targets} period={period} />
+
+    <TransactionList
+      transactions={monthTx}
+      onDelete={onDelete}
+      onEdit={onEdit}
+      title={`Transactions · ${monthLabel}`}
+      allowImport={false}
+      emptyText={`No transactions for ${monthLabel}`}
+    />
 
     {drill && (
       <DrillModal

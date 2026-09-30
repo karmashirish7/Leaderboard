@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { getTransactions, deleteTransaction, logout, getTargets, fetchTargets } from '../utils/storage';
 import HeroStats from './HeroStats';
 import Leaderboard from './Leaderboard';
@@ -6,7 +6,7 @@ import Analytics from './Analytics';
 import TransactionForm from './TransactionForm';
 import TransactionList from './TransactionList';
 import TargetSettings from './TargetSettings';
-import { Plus, LogOut, TrendingUp, BarChart3, List, ChevronUp, PieChart, Target } from 'lucide-react';
+import { Plus, LogOut, TrendingUp, BarChart3, List, ChevronUp, PieChart, Target, Clock } from 'lucide-react';
 import './Dashboard.css';
 
 export default function Dashboard({ onLogout }) {
@@ -17,6 +17,11 @@ export default function Dashboard({ onLogout }) {
   const [editingTransaction, setEditingTransaction] = useState(null);
   const [activeTab, setActiveTab] = useState('all');
   const [targets, setTargets] = useState(() => getTargets());
+
+  const pendingTransactions = useMemo(
+    () => transactions.filter(t => Number(t.remainingAmount) > 0),
+    [transactions],
+  );
 
   const refresh = useCallback(async () => {
     const data = await getTransactions();
@@ -106,6 +111,13 @@ export default function Dashboard({ onLogout }) {
           Transactions
         </button>
         <button
+          className={`nav-btn ${activeTab === 'pending' ? 'active' : ''}`}
+          onClick={() => setActiveTab('pending')}
+        >
+          <Clock size={16} />
+          Pending
+        </button>
+        <button
           className={`nav-btn ${activeTab === 'analytics' ? 'active' : ''}`}
           onClick={() => setActiveTab('analytics')}
         >
@@ -135,11 +147,29 @@ export default function Dashboard({ onLogout }) {
                 onDelete={handleDelete}
                 onEdit={handleEdit}
                 onImported={refresh}
+                monthFilter
+              />
+            )}
+
+            {activeTab === 'pending' && (
+              <TransactionList
+                transactions={pendingTransactions}
+                onDelete={handleDelete}
+                onEdit={handleEdit}
+                title="Pending Payments"
+                allowImport={false}
+                showPendingTotal
+                emptyText="No pending payments 🎉"
               />
             )}
 
             {activeTab === 'analytics' && (
-              <Analytics transactions={transactions} />
+              <Analytics
+                transactions={transactions}
+                targets={targets}
+                onDelete={handleDelete}
+                onEdit={handleEdit}
+              />
             )}
           </>
         )}

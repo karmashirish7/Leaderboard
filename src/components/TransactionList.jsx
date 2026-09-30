@@ -1,9 +1,25 @@
 import { useState, useMemo, useRef } from 'react';
-import { SALESPERSONS, SUBSCRIPTION_TYPES, bulkInsertTransactions } from '../utils/storage';
+import { SALESPERSONS, SUBSCRIPTION_TYPES, bulkInsertTransactions, exVat } from '../utils/storage';
+import { filterByMonth } from '../utils/leaderboard';
+import MonthNav from './MonthNav';
 import { Search, Filter, Trash2, Pencil, ChevronDown, ChevronUp, Download, Upload } from 'lucide-react';
 import './TransactionList.css';
 
-export default function TransactionList({ transactions, onDelete, onEdit, onImported }) {
+export default function TransactionList({
+  transactions,
+  onDelete,
+  onEdit,
+  onImported,
+  title = 'Transaction History',
+  monthFilter = false,   // show month navigation (defaults to current month)
+  allowImport = true,
+  showPendingTotal = false,
+  emptyText = 'No transactions yet',
+}) {
+  const [period, setPeriod] = useState(() => {
+    const now = new Date();
+    return { year: now.getFullYear(), month: now.getMonth() };
+  });
   const [searchTerm, setSearchTerm] = useState('');
   const [filterPerson, setFilterPerson] = useState('');
   const [filterType, setFilterType] = useState('');
@@ -17,8 +33,10 @@ export default function TransactionList({ transactions, onDelete, onEdit, onImpo
   const fileInputRef = useRef(null);
 
   const filtered = useMemo(() => {
-    let result = [...transactions];
-    
+    let result = monthFilter && period
+      ? filterByMonth(transactions, period.year, period.month)
+      : [...transactions];
+
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
       result = result.filter(t =>
@@ -39,6 +57,7 @@ export default function TransactionList({ transactions, onDelete, onEdit, onImpo
         case 'salesperson': valA = a.salesperson; valB = b.salesperson; break;
         case 'totalAmount': valA = a.totalAmount; valB = b.totalAmount; break;
         case 'paidAmount': valA = a.paidAmount; valB = b.paidAmount; break;
+        case 'exVat': valA = exVat(a.paidAmount); valB = exVat(b.paidAmount); break;
         default: valA = a.date; valB = b.date;
       }
       if (typeof valA === 'string') {
@@ -48,7 +67,9 @@ export default function TransactionList({ transactions, onDelete, onEdit, onImpo
     });
 
     return result;
-  }, [transactions, searchTerm, filterPerson, filterType, dateFrom, dateTo, sortField, sortDir]);
+  }, [transactions, monthFilter, period, searchTerm, filterPerson, filterType, dateFrom, dateTo, sortField, sortDir]);
+
+  const totalPending = filtered.reduce((sum, t) => sum + (Number(t.remainingAmount) || 0), 0);
 
   const toggleSort = (field) => {
     if (sortField === field) {
@@ -148,7 +169,7 @@ export default function TransactionList({ transactions, onDelete, onEdit, onImpo
   };
 
   const exportToCSV = () => {
-    const headers = ['Date', 'Salesperson', 'Store', 'Plan', 'Duration', 'Total (Rs)', 'Paid (Rs)', 'Remaining (Rs)'];
+    const headers = ['Date', 'Salesperson', 'Store', 'Plan', 'Duration', 'Total (Rs)', 'Paid (Rs)', 'Ex VAT (Rs)', 'Remaining (Rs)'];
     const rows = filtered.map(t => [
       t.date,
       t.salesperson,
@@ -157,6 +178,7 @@ export default function TransactionList({ transactions, onDelete, onEdit, onImpo
       t.subscriptionDuration || '',
       t.totalAmount,
       t.paidAmount,
+      exVat(t.paidAmount),
       t.remainingAmount,
     ]);
     const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
@@ -172,9 +194,14 @@ export default function TransactionList({ transactions, onDelete, onEdit, onImpo
   return (
     <section className="transactions-section" id="transactions">
       <div className="transactions-header">
-        <h2>Transaction History</h2>
+        <h2>{title}</h2>
         <div className="transactions-header-right">
+          {monthFilter && <MonthNav value={period} onChange={setPeriod} allowAll />}
           <span className="tx-count">{filtered.length} transactions</span>
+          {showPendingTotal && (
+            <span className="tx-pending-total">Due Rs {totalPending.toLocaleString()}</span>
+          )}
+          {allowImport && <>
           <button
             className={`import-btn ${importing ? 'loading' : ''}`}
             onClick={() => fileInputRef.current?.click()}
@@ -191,6 +218,7 @@ export default function TransactionList({ transactions, onDelete, onEdit, onImpo
             style={{ display: 'none' }}
             onChange={handleImport}
           />
+          </>}
           {filtered.length > 0 && (
             <button className="export-btn" onClick={exportToCSV} title="Export to CSV">
               <Download size={15} />
@@ -265,7 +293,7 @@ export default function TransactionList({ transactions, onDelete, onEdit, onImpo
 
       {filtered.length === 0 ? (
         <div className="no-transactions">
-          <p>{transactions.length === 0 ? 'No transactions yet' : 'No matching transactions'}</p>
+          <p>{transactions.length === 0 ? emptyText : 'No matching transactions'}</p>
         </div>
       ) : (
         <div className="table-wrapper">
@@ -286,6 +314,9 @@ export default function TransactionList({ transactions, onDelete, onEdit, onImpo
                 </th>
                 <th onClick={() => toggleSort('paidAmount')} className="sortable">
                   Paid <SortIcon field="paidAmount" />
+                </th>
+                <th onClick={() => toggleSort('exVat')} className="sortable" title="Paid amount excluding 13% VAT">
+                  Ex VAT <SortIcon field="exVat" />
                 </th>
                 <th>Remaining</th>
                 <th>Actions</th>
@@ -313,6 +344,7 @@ export default function TransactionList({ transactions, onDelete, onEdit, onImpo
                   </td>
                   <td className="td-amount" data-label="Total">Rs {Number(t.totalAmount).toLocaleString()}</td>
                   <td className="td-amount td-paid" data-label="Paid">Rs {Number(t.paidAmount).toLocaleString()}</td>
+                  <td className="td-amount" data-label="Ex VAT">Rs {exVat(t.paidAmount).toLocaleString()}</td>
                   <td className={`td-amount ${Number(t.remainingAmount) > 0 ? 'td-remaining' : ''}`} data-label="Remaining">
                     Rs {Number(t.remainingAmount).toLocaleString()}
                   </td>

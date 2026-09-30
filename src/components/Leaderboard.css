@@ -225,6 +225,12 @@
   color: #fff;
 }
 
+.stat-exvat {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.55);
+}
+
 .stat-value.remaining {
   color: #fdcb6e;
 }
@@ -262,6 +268,9 @@
 .sub-badge.premium { color: #a29bfe; border-color: rgba(162, 155, 254, 0.2); }
 .sub-badge.business-plus { color: #00cec9; border-color: rgba(0, 206, 201, 0.2); }
 .sub-badge.platinum { color: #ffd700; border-color: rgba(255, 215, 0, 0.2); }
+.sub-badge.sambad---starters { color: #fab1a0; border-color: rgba(250, 177, 160, 0.2); }
+.sub-badge.sambad---growth { color: #e17055; border-color: rgba(225, 112, 85, 0.2); }
+.sub-badge.enterprise { color: #ff7675; border-color: rgba(255, 118, 117, 0.2); }
 
 .card-points {
   display: flex;
